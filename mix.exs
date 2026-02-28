@@ -10,8 +10,13 @@ defmodule GameKeeper.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      compilers: [:phoenix_live_view] ++ Mix.compilers(),
+      compilers: [:boundary, :phoenix_live_view] ++ Mix.compilers(),
       listeners: [Phoenix.CodeReloader]
+      # boundary: [
+      #   default: [
+      #     check: [aliases: true]
+      #   ]
+      # ]
     ]
   end
 
@@ -20,7 +25,7 @@ defmodule GameKeeper.MixProject do
   # Type `mix help compile.app` for more information.
   def application do
     [
-      mod: {GameKeeper.Application, []},
+      mod: {GameKeeperApp.Application, []},
       extra_applications: [:logger, :runtime_tools]
     ]
   end
@@ -40,6 +45,7 @@ defmodule GameKeeper.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
+      {:boundary, "~> 0.10", runtime: false},
       {:phoenix, "~> 1.8.4"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},

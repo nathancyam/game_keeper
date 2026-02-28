@@ -2,6 +2,7 @@ defmodule GameKeeper.Events.Pipeline do
   use Broadway
 
   alias GameKeeper.Events
+  alias GameKeeper.Games
 
   def start_link(_opts) do
     Broadway.start_link(__MODULE__,
@@ -24,7 +25,7 @@ defmodule GameKeeper.Events.Pipeline do
         _context
       ) do
     %Events.Message{game_id: game_id, messages: messages} = data
-    {:ok, offset} = GameKeeper.Games.EventLog.log_scores(game_id, messages)
+    {:ok, offset} = Games.log_scores(game_id, messages)
     Broadway.Message.update_data(b_msg, fn msg -> %{msg | offset: offset} end)
   end
 

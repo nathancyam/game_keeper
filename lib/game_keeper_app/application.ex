@@ -1,9 +1,11 @@
-defmodule GameKeeper.Application do
+defmodule GameKeeperApp.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
 
   use Application
+
+  use Boundary, deps: [GameKeeperWeb]
 
   @impl true
   def start(_type, _args) do
