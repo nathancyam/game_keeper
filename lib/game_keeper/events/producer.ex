@@ -23,13 +23,13 @@ defmodule GameKeeper.Events.Producer do
 
   @impl GenStage
   def handle_call({:push_events, game_id, events}, from, state) do
-    messages = %Message{
+    message = %Message{
       game_id: game_id,
       messages: events,
       from: from
     }
 
-    {:noreply, [messages], state}
+    {:noreply, [message], state}
   end
 
   @impl GenStage

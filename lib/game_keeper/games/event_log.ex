@@ -10,7 +10,8 @@ defmodule GameKeeper.Games.EventLog do
 
   def start_link(opts \\ []) do
     {name, opts} = Keyword.pop(opts, :name, __MODULE__)
-    GenServer.start_link(__MODULE__, opts, name: name)
+    {:via, Registry, {GameKeeper.GamesRegistry, game_id}} = name
+    GenServer.start_link(__MODULE__, Keyword.put(opts, :game_id, game_id), name: name)
   end
 
   @doc """
@@ -24,17 +25,24 @@ defmodule GameKeeper.Games.EventLog do
   end
 
   @impl GenServer
-  def init(_opts) do
+  def init(opts) do
     # State: %{game_id => [events]} — events stored newest-first, reversed on read
-    {:ok, %{events: [], offset: 0}}
+    {:ok, %{game_id: opts[:game_id], events: [], offset: 0}}
   end
 
   @impl GenServer
   def handle_call({:log_scores, score_events}, _from, state) do
+    start_metadata = %{game_id: state.game_id, pid: self()}
+
     state =
-      state
-      |> Map.update(:events, score_events, &(score_events ++ &1))
-      |> Map.update(:offset, length(score_events), &(&1 + length(score_events)))
+      :telemetry.span([:game_keeper, :event_log, :log_scores], start_metadata, fn ->
+        state =
+          state
+          |> Map.update(:events, score_events, &(score_events ++ &1))
+          |> Map.update(:offset, length(score_events), &(&1 + length(score_events)))
+
+        {state, Map.put(start_metadata, :offset, state.offset)}
+      end)
 
     {:reply, {:ok, state.offset}, state}
   end
