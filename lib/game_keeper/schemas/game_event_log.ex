@@ -8,7 +8,7 @@ defmodule GameKeeper.Schemas.GameEventLog do
     field :type, :string
     field :value, :string
     field :metadata, :map
-    field :occured_at, :utc_datetime_usec
+    field :occurred_at, :utc_datetime_usec
 
     belongs_to :game, GameKeeper.Schemas.Game
 
@@ -18,7 +18,7 @@ defmodule GameKeeper.Schemas.GameEventLog do
   @doc false
   def changeset(game_event_log, attrs) do
     game_event_log
-    |> cast(attrs, [:type, :value, :metadata, :occured_at])
+    |> cast(attrs, [:type, :value, :metadata, :occurred_at])
     |> validate_required([:type, :value, :occured_at])
   end
 end

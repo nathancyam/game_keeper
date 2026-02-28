@@ -1,6 +1,8 @@
 defmodule GameKeeper.Games.EventLog do
   use GenServer
 
+  alias GameKeeper.Games
+
   def start_event_log(game_id) when is_binary(game_id) do
     DynamicSupervisor.start_child(
       GameKeeper.Games.EventLogSupervisor,
@@ -15,10 +17,8 @@ defmodule GameKeeper.Games.EventLog do
   end
 
   @doc """
-  Log a basketball score event. Blocks the caller until the event is recorded,
-  providing backpressure when the log is under load.
-
-  Points must be 1, 2, or 3.
+  Log a list of score events for a game. Blocks the caller until the events are
+  recorded, providing backpressure when the log is under load.
   """
   def log_scores(game_id, scores) when is_binary(game_id) and is_list(scores) do
     GenServer.call(via_tuple(game_id), {:log_scores, scores})
@@ -40,6 +40,14 @@ defmodule GameKeeper.Games.EventLog do
           state
           |> Map.update(:events, score_events, &(score_events ++ &1))
           |> Map.update(:offset, length(score_events), &(&1 + length(score_events)))
+
+        GameKeeper.Repo.transact(fn ->
+          for event <- score_events do
+            Games.insert_score_event(state.game_id, event)
+          end
+
+          {:ok, []}
+        end)
 
         {state, Map.put(start_metadata, :offset, state.offset)}
       end)
