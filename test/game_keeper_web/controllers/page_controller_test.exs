@@ -1,5 +1,5 @@
 defmodule GameKeeperWeb.PageControllerTest do
-  use GameKeeperWeb.ConnCase
+  use GameKeeperWebSupport.ConnCase
 
   test "GET /", %{conn: conn} do
     conn = get(conn, ~p"/")

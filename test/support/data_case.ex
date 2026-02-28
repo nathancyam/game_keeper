@@ -1,4 +1,4 @@
-defmodule GameKeeper.DataCase do
+defmodule GameKeeperSupport.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,11 +10,12 @@ defmodule GameKeeper.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use GameKeeper.DataCase, async: true`, although
+  by setting `use GameKeeperSupport.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
   use ExUnit.CaseTemplate
+  use Boundary, check: [in: false, out: false]
 
   using do
     quote do
@@ -23,12 +24,12 @@ defmodule GameKeeper.DataCase do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import GameKeeper.DataCase
+      import GameKeeperSupport.DataCase
     end
   end
 
   setup tags do
-    GameKeeper.DataCase.setup_sandbox(tags)
+    GameKeeperSupport.DataCase.setup_sandbox(tags)
     :ok
   end
 

@@ -1,4 +1,4 @@
-defmodule GameKeeperWeb.ConnCase do
+defmodule GameKeeperWebSupport.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -11,11 +11,12 @@ defmodule GameKeeperWeb.ConnCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use GameKeeperWeb.ConnCase, async: true`, although
+  by setting `use GameKeeperWebSupport.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
 
   use ExUnit.CaseTemplate
+  use Boundary, check: [in: false, out: false]
 
   using do
     quote do
@@ -27,12 +28,12 @@ defmodule GameKeeperWeb.ConnCase do
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import GameKeeperWeb.ConnCase
+      import GameKeeperWebSupport.ConnCase
     end
   end
 
   setup tags do
-    GameKeeper.DataCase.setup_sandbox(tags)
+    GameKeeperSupport.DataCase.setup_sandbox(tags)
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 end

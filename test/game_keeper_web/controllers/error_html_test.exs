@@ -1,5 +1,5 @@
 defmodule GameKeeperWeb.ErrorHTMLTest do
-  use GameKeeperWeb.ConnCase, async: true
+  use GameKeeperWebSupport.ConnCase, async: true
 
   # Bring render_to_string/4 for testing custom views
   import Phoenix.Template, only: [render_to_string: 4]

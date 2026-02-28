@@ -1,5 +1,5 @@
 defmodule GameKeeperWeb.ErrorJSONTest do
-  use GameKeeperWeb.ConnCase, async: true
+  use GameKeeperWebSupport.ConnCase, async: true
 
   test "renders 404" do
     assert GameKeeperWeb.ErrorJSON.render("404.json", %{}) == %{errors: %{detail: "Not Found"}}
