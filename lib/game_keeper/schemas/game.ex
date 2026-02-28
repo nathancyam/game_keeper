@@ -1,0 +1,22 @@
+defmodule GameKeeper.Schemas.Game do
+  use Ecto.Schema
+  import Ecto.Changeset
+
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
+  schema "games" do
+    field :name, :string
+    field :sport, :string
+
+    has_many :events, GameKeeper.Schemas.GameEventLog, preload_order: [asc: :occured_at]
+
+    timestamps(type: :utc_datetime)
+  end
+
+  @doc false
+  def changeset(game, attrs) do
+    game
+    |> cast(attrs, [:name, :sport])
+    |> validate_required([:name, :sport])
+  end
+end
