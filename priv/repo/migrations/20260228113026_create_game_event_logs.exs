@@ -17,7 +17,9 @@ defmodule GameKeeper.Repo.Migrations.CreateGameEventLogs do
     end
 
     create index(:game_event_logs, [:game_id])
-    create index(:game_event_logs, [:game_id, :offset])
     create index(:game_event_logs, [:occurred_at])
+
+    # An offset can not be used more than once
+    create unique_index(:game_event_logs, [:game_id, :offset])
   end
 end

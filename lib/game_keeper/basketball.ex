@@ -8,7 +8,7 @@ defmodule GameKeeper.Basketball do
 
   @behaviour GameKeeper.Sports.Sport
 
-  use Boundary, deps: [GameKeeper.Schemas, GameKeeper.Sports]
+  use Boundary, deps: [GameKeeper.Schemas, GameKeeper.Sports], exports: :all
 
   alias GameKeeper.Basketball.ScoreEvent
   alias GameKeeper.Sports.Sport

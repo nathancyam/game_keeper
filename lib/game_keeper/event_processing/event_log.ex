@@ -22,10 +22,7 @@ defmodule GameKeeper.EventProcessing.EventLog do
 
     state =
       :telemetry.span([:game_keeper, :event_log, :log_scores], start_metadata, fn ->
-        state =
-          state
-          |> Map.update(:events, score_events, &(score_events ++ &1))
-          |> Map.update(:offset, length(score_events), &(&1 + length(score_events)))
+        state = Map.update(state, :events, score_events, &(score_events ++ &1))
 
         {:ok, game} =
           Repo.transact(fn ->
@@ -40,13 +37,15 @@ defmodule GameKeeper.EventProcessing.EventLog do
             {:ok, game}
           end)
 
-          {%{state | game: game}, Map.put(start_metadata, :offset, state.offset)}
+        offset = state.offset + length(score_events)
+
+        {%{state | game: game, offset: offset}, Map.put(start_metadata, :offset, offset)}
       end)
 
     {:reply, {:ok, state.offset}, state}
   end
 
-  defp process_events(score_events, state) do
+  defp process_events(score_events, state) when is_list(score_events) do
     score_events_with_offsets = Enum.with_index(score_events, state.offset + 1)
 
     initial_acc = %{
@@ -61,7 +60,8 @@ defmodule GameKeeper.EventProcessing.EventLog do
         known_props = %{
           offset: offset,
           inserted_at: {:placeholder, :inserted_at},
-          module: to_string(event_type)
+          module: to_string(event_type),
+          game_id: state.game.id
         }
 
         props = Map.merge(event_type.dump(event), known_props)
