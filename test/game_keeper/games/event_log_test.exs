@@ -29,27 +29,27 @@ defmodule GameKeeper.Games.EventLogTest do
   end
 
   test "log_scores/2 returns offset of 1 after a single event", %{game: game} do
-    assert {:ok, 1} = EventLog.log_scores(game.id, [score_event()])
+    assert {:ok, 1} = EventLog.log_events(game.id, [score_event()])
   end
 
   test "offset increments with successive calls", %{game: game} do
-    assert {:ok, 1} = EventLog.log_scores(game.id, [score_event()])
-    assert {:ok, 2} = EventLog.log_scores(game.id, [score_event()])
-    assert {:ok, 3} = EventLog.log_scores(game.id, [score_event()])
+    assert {:ok, 1} = EventLog.log_events(game.id, [score_event()])
+    assert {:ok, 2} = EventLog.log_events(game.id, [score_event()])
+    assert {:ok, 3} = EventLog.log_events(game.id, [score_event()])
   end
 
   test "offset advances by the number of events in a single call", %{game: game} do
-    assert {:ok, 4} = EventLog.log_scores(game.id, List.duplicate(score_event(), 4))
+    assert {:ok, 4} = EventLog.log_events(game.id, List.duplicate(score_event(), 4))
   end
 
   test "offset accumulates correctly across mixed-size batches", %{game: game} do
-    assert {:ok, 3} = EventLog.log_scores(game.id, List.duplicate(score_event(), 3))
-    assert {:ok, 4} = EventLog.log_scores(game.id, [score_event()])
-    assert {:ok, 7} = EventLog.log_scores(game.id, List.duplicate(score_event(), 3))
+    assert {:ok, 3} = EventLog.log_events(game.id, List.duplicate(score_event(), 3))
+    assert {:ok, 4} = EventLog.log_events(game.id, [score_event()])
+    assert {:ok, 7} = EventLog.log_events(game.id, List.duplicate(score_event(), 3))
   end
 
   test "logging an empty list returns the current offset unchanged", %{game: game} do
-    assert {:ok, 2} = EventLog.log_scores(game.id, List.duplicate(score_event(), 2))
-    assert {:ok, 2} = EventLog.log_scores(game.id, [])
+    assert {:ok, 2} = EventLog.log_events(game.id, List.duplicate(score_event(), 2))
+    assert {:ok, 2} = EventLog.log_events(game.id, [])
   end
 end

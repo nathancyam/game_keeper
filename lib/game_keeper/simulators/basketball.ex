@@ -50,7 +50,7 @@ defmodule GameKeeper.Simulators.Basketball do
       plays
       |> List.flatten()
       |> Enum.reduce(%{home: 0, away: 0}, fn event, score ->
-        {:ok, _offset} = Games.log_scores(game_id, [event])
+        {:ok, _offset} = Games.log_events(game_id, [event])
 
         key = if event.team.id == home_team.id, do: :home, else: :away
         Map.update!(score, key, &(&1 + event.points))

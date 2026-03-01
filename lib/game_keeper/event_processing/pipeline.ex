@@ -4,7 +4,7 @@ defmodule GameKeeper.EventProcessing.Pipeline do
 
   ## Architecture
 
-  Each processor calls `Games.log_scores/2`, which issues a synchronous
+  Each processor calls `Games.log_events/2`, which issues a synchronous
   `GenServer.call/2` to the `GameKeeper.EventProcessing.EventLog` GenServer
   registered for the given game in `GameKeeper.GamesRegistry`.
 
@@ -48,7 +48,7 @@ defmodule GameKeeper.EventProcessing.Pipeline do
   @impl Broadway
   def handle_message(_processor, %Broadway.Message{data: data} = b_msg, _context) do
     %EventProcessing.Message{game_id: game_id, messages: messages} = data
-    {:ok, offset} = Games.log_scores(game_id, messages)
+    {:ok, offset} = Games.log_events(game_id, messages)
     Broadway.Message.update_data(b_msg, fn msg -> %{msg | offset: offset} end)
   end
 

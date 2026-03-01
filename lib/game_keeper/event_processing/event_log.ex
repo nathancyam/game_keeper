@@ -22,16 +22,16 @@ defmodule GameKeeper.EventProcessing.EventLog do
   end
 
   @impl GenServer
-  def handle_call({:log_scores, score_events}, _from, state) do
+  def handle_call({:log_events, events}, _from, state) when is_list(events) do
     start_metadata = %{game_id: state.game.id, pid: self()}
 
     state =
       :telemetry.span([:game_keeper, :event_log, :log_scores], start_metadata, fn ->
-        state = Map.update(state, :events, score_events, &(score_events ++ &1))
+        state = Map.update(state, :events, events, &(events ++ &1))
 
         {:ok, game} =
           Repo.transact(fn ->
-            %{game: game, processed_events: processed_events} = process_events(score_events, state)
+            %{game: game, processed_events: processed_events} = process_events(events, state)
 
             {_, _persisted_events} =
               Repo.insert_all(GameKeeper.Schemas.GameEventLog, processed_events,
@@ -42,7 +42,7 @@ defmodule GameKeeper.EventProcessing.EventLog do
             {:ok, game}
           end)
 
-        offset = state.offset + length(score_events)
+        offset = state.offset + length(events)
 
         {%{state | game: game, offset: offset}, Map.put(start_metadata, :offset, offset)}
       end)
@@ -50,8 +50,8 @@ defmodule GameKeeper.EventProcessing.EventLog do
     {:reply, {:ok, state.offset}, state}
   end
 
-  defp process_events(score_events, state) when is_list(score_events) do
-    score_events_with_offsets = Enum.with_index(score_events, state.offset + 1)
+  defp process_events(events, state) when is_list(events) do
+    score_events_with_offsets = Enum.with_index(events, state.offset + 1)
 
     initial_acc = %{
       processed_events: [],
