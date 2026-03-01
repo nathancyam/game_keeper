@@ -11,7 +11,7 @@ defmodule GameKeeper.Repo.Migrations.CreateGameEventLogs do
       add :offset, :integer
       add :module, :string
 
-      add :game_id, references(:games, on_delete: :delete_all, type: :binary_id)
+      add :game_id, references(:games, on_delete: :delete_all, type: :binary_id), null: false
 
       timestamps(type: :utc_datetime, updated_at: false)
     end
