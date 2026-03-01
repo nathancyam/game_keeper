@@ -1,4 +1,4 @@
-defmodule GameKeeper.Sports.Basketball.Team do
+defmodule GameKeeper.Basketball.Team do
   @moduledoc """
   Represents a team participating in a basketball game.
   """

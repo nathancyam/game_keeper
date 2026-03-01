@@ -9,7 +9,7 @@ defmodule GameKeeper.Sports do
   use Boundary, exports: :all
 
   @sports %{
-    "basketball" => GameKeeper.Sports.Basketball
+    :basketball => GameKeeper.Basketball
   }
 
   @doc """
@@ -37,7 +37,7 @@ defmodule GameKeeper.Sports do
     end
   end
 
-  defp fetch_sport(sport) do
+  def fetch_sport(sport) do
     case Map.fetch(@sports, sport) do
       {:ok, mod} -> {:ok, mod}
       :error -> {:error, :unknown_sport}

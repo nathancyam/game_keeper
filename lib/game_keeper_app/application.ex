@@ -17,7 +17,7 @@ defmodule GameKeeperApp.Application do
       # Game event processing pipelines.
       {Registry, keys: :unique, name: GameKeeper.GamesRegistry},
       {DynamicSupervisor, name: GameKeeper.Games.EventLogSupervisor, strategy: :one_for_one},
-      GameKeeper.Events.Pipeline,
+      GameKeeper.EventProcessing.Pipeline,
 
       # Start a worker by calling: GameKeeper.Worker.start_link(arg)
       # {GameKeeper.Worker, arg},

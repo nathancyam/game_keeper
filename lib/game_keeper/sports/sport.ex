@@ -6,6 +6,8 @@ defmodule GameKeeper.Sports.Sport do
   and for validating individual events against its own ruleset.
   """
 
+  alias GameKeeper.Schemas.Game
+
   @doc """
   Returns the list of atom event types supported by this sport.
 
@@ -13,13 +15,6 @@ defmodule GameKeeper.Sports.Sport do
   """
   @callback event_types() :: [atom()]
 
-  @doc """
-  Validates a raw event map against the sport's rules.
-
-  Returns `{:ok, event}` on success or `{:error, reason}` on failure.
-  The returned event may be the original map, a typed struct, or any
-  normalised representation the sport module chooses.
-  """
-  @callback validate_event(type :: atom(), params :: map()) ::
-              {:ok, term()} | {:error, term()}
+  @callback process_event(sport_event :: term(), game :: Game.t()) ::
+              {:ok, Game.t()} | {:error, any()}
 end

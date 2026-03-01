@@ -1,0 +1,74 @@
+defmodule GameKeeper.EventProcessing.EventLog do
+  @moduledoc false
+  use GenServer
+
+  alias GameKeeper.Repo
+
+  def start_link(opts \\ []) do
+    {name, opts} = Keyword.pop(opts, :name, __MODULE__)
+    {:via, Registry, {GameKeeper.GamesRegistry, game_id}} = name
+    GenServer.start_link(__MODULE__, Keyword.put(opts, :game_id, game_id), name: name)
+  end
+
+  @impl GenServer
+  def init(opts) do
+    # State: %{game_id => [events]} — events stored newest-first, reversed on read
+    {:ok, %{game: opts[:game], sport: opts[:sport], events: [], offset: 0}}
+  end
+
+  @impl GenServer
+  def handle_call({:log_scores, score_events}, _from, state) do
+    start_metadata = %{game_id: state.game.id, pid: self()}
+
+    state =
+      :telemetry.span([:game_keeper, :event_log, :log_scores], start_metadata, fn ->
+        state =
+          state
+          |> Map.update(:events, score_events, &(score_events ++ &1))
+          |> Map.update(:offset, length(score_events), &(&1 + length(score_events)))
+
+        {:ok, game} =
+          Repo.transact(fn ->
+            %{game: game, processed_events: processed_events} = process_events(score_events, state)
+
+            {_, _persisted_events} =
+              Repo.insert_all(GameKeeper.Schemas.GameEventLog, processed_events,
+                returning: true,
+                placeholders: %{inserted_at: DateTime.utc_now(:second)}
+              )
+
+            {:ok, game}
+          end)
+
+          {%{state | game: game}, Map.put(start_metadata, :offset, state.offset)}
+      end)
+
+    {:reply, {:ok, state.offset}, state}
+  end
+
+  defp process_events(score_events, state) do
+    score_events_with_offsets = Enum.with_index(score_events, state.offset + 1)
+
+    initial_acc = %{
+      processed_events: [],
+      game: state.game
+    }
+
+    for {%event_type{} = event, offset} <- score_events_with_offsets, reduce: initial_acc do
+      acc ->
+        {:ok, game} = state.sport.process_event(event, acc.game)
+
+        known_props = %{
+          offset: offset,
+          inserted_at: {:placeholder, :inserted_at},
+          module: to_string(event_type)
+        }
+
+        props = Map.merge(event_type.dump(event), known_props)
+
+        acc
+        |> Map.put(:game, game)
+        |> Map.update!(:processed_events, &[props | &1])
+    end
+  end
+end

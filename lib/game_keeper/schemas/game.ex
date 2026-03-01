@@ -8,7 +8,7 @@ defmodule GameKeeper.Schemas.Game do
   @foreign_key_type :binary_id
   schema "games" do
     field :name, :string
-    field :sport, :string
+    field :sport, Ecto.Enum, values: [:basketball]
 
     has_many :events, GameKeeper.Schemas.GameEventLog, preload_order: [asc: :occured_at]
 

@@ -1,10 +1,10 @@
-defmodule GameKeeper.Events.Producer do
+defmodule GameKeeper.EventProcessing.Producer do
   @moduledoc false
   @behaviour Broadway.Acknowledger
 
   use GenStage
 
-  alias GameKeeper.Events.Message
+  alias GameKeeper.EventProcessing.Message
 
   def start_link(opts) do
     {name, opts} = Keyword.pop(opts, :name, __MODULE__)

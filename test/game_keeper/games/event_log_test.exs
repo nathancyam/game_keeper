@@ -1,10 +1,10 @@
 defmodule GameKeeper.Games.EventLogTest do
   use GameKeeperSupport.DataCase, async: false
 
+  alias GameKeeper.Basketball.ScoreEvent
+  alias GameKeeper.Basketball.Team
   alias GameKeeper.Games
   alias GameKeeper.Games.EventLog
-  alias GameKeeper.Sports.Basketball.ScoreEvent
-  alias GameKeeper.Sports.Basketball.Team
 
   @team %Team{id: "team-a", name: "Team A"}
 

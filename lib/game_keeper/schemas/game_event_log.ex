@@ -11,10 +11,13 @@ defmodule GameKeeper.Schemas.GameEventLog do
     field :value, :string
     field :metadata, :map
     field :occurred_at, :utc_datetime_usec
+    field :offset, :integer
+
+    field :module, :string
 
     belongs_to :game, GameKeeper.Schemas.Game
 
-    timestamps(type: :utc_datetime)
+    timestamps(type: :utc_datetime, updated_at: false)
   end
 
   @doc false
