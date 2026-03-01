@@ -4,25 +4,26 @@ defmodule GameKeeper.EventProcessing.Pipeline do
 
   ## Architecture
 
-  Each processor calls `Games.log_scores/2`, which delegates to the
-  `GameKeeper.Games.EventLog` GenServer for the given game via `GenServer.call/2`.
+  Each processor calls `Games.log_scores/2`, which issues a synchronous
+  `GenServer.call/2` to the `GameKeeper.EventProcessing.EventLog` GenServer
+  registered for the given game in `GameKeeper.GamesRegistry`.
 
   ## Backpressure via EventLog
 
-  `EventLog.log_scores/2` is a **synchronous, blocking** call. Each processor
-  is held for the duration of the database transaction that persists the score
+  `Games.log_scores/2` is a **synchronous, blocking** call. Each processor is
+  held for the duration of the database transaction that persists the score
   events. Broadway will stop pulling from the producer once all processors are
   occupied, providing natural backpressure.
 
-  Because each game has its own `EventLog` GenServer (looked up via
-  `GameKeeper.GamesRegistry`), processors handling different games do not block
-  each other. Contention only occurs when multiple messages target the same
-  game, as they will queue behind that game's single GenServer mailbox.
+  Because each game has its own `EventLog` GenServer, processors handling
+  different games do not block each other. Contention only occurs when multiple
+  messages target the same game, as they will queue behind that game's single
+  GenServer mailbox.
 
   ## Message Flow
 
-      Producer → transform/2 → handle_message/3 → EventLog.log_scores/2 → DB
-                                                        ↑ blocks processor
+      Producer → transform/2 → handle_message/3 → Games.log_scores/2 → EventLog (GenServer) → DB
+                                                                              ↑ blocks processor
   """
 
   use Broadway
