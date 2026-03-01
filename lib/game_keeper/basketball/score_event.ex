@@ -6,7 +6,7 @@ defmodule GameKeeper.Basketball.ScoreEvent do
   @behaviour GameKeeper.Sports.EventType
 
   @enforce_keys [:points, :team, :occurred_at]
-  defstruct [:points, :team, :occurred_at]
+  defstruct [:points, :team, :occurred_at, offset: nil, inserted_at: nil]
 
   @type t :: %__MODULE__{
           points: 1 | 2 | 3,
@@ -26,7 +26,9 @@ defmodule GameKeeper.Basketball.ScoreEvent do
     %__MODULE__{
       points: String.to_integer(log_event.value),
       team: nil,
-      occurred_at: log_event.occurred_at
+      occurred_at: log_event.occurred_at,
+      offset: log_event.offset,
+      inserted_at: log_event.inserted_at
     }
   end
 end

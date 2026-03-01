@@ -2,6 +2,7 @@ defmodule GameKeeper.EventProcessing.EventLog do
   @moduledoc false
   use GenServer
 
+  alias GameKeeper.EventProcessing
   alias GameKeeper.Repo
 
   def start_link(opts \\ []) do
@@ -12,8 +13,12 @@ defmodule GameKeeper.EventProcessing.EventLog do
 
   @impl GenServer
   def init(opts) do
-    # State: %{game_id => [events]} — events stored newest-first, reversed on read
-    {:ok, %{game: opts[:game], sport: opts[:sport], events: [], offset: 0}}
+    game = opts[:game]
+    events = EventProcessing.get_event_log(game)
+
+    last_offset = events |> hd() |> Map.get(:offset)
+
+    {:ok, %{game: game, sport: opts[:sport], events: events, offset: last_offset}}
   end
 
   @impl GenServer
