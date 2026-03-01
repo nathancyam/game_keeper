@@ -4,7 +4,6 @@ defmodule GameKeeperApp.Application do
   @moduledoc false
 
   use Application
-
   use Boundary, deps: [GameKeeperWeb]
 
   @impl true

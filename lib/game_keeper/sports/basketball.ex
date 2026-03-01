@@ -7,14 +7,16 @@ defmodule GameKeeper.Sports.Basketball do
 
   @behaviour GameKeeper.Sports.Sport
 
-  alias GameKeeper.Sports.Basketball.{ScoreEvent, Team}
+  alias GameKeeper.Sports.Basketball.ScoreEvent
+  alias GameKeeper.Sports.Basketball.Team
+  alias GameKeeper.Sports.Sport
 
   @valid_points [1, 2, 3]
 
-  @impl GameKeeper.Sports.Sport
+  @impl Sport
   def event_types, do: [:score]
 
-  @impl GameKeeper.Sports.Sport
+  @impl Sport
   def validate_event(:score, %{points: points, team: %Team{} = team, occurred_at: occurred_at})
       when points in @valid_points do
     {:ok, %ScoreEvent{points: points, team: team, occurred_at: occurred_at}}

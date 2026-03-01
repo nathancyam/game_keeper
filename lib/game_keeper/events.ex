@@ -1,4 +1,5 @@
 defmodule GameKeeper.Events do
+  @moduledoc false
   use Boundary, deps: [GameKeeper.Games]
 
   alias GameKeeper.Events.Pipeline

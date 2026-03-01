@@ -1,4 +1,5 @@
 defmodule GameKeeper.Games.EventLog do
+  @moduledoc false
   use GenServer
 
   alias GameKeeper.Games

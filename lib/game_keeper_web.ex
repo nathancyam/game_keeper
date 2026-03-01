@@ -24,10 +24,11 @@ defmodule GameKeeperWeb do
     quote do
       use Phoenix.Router, helpers: false
 
-      # Import common connection and controller functions to use in pipelines
-      import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
+
+      # Import common connection and controller functions to use in pipelines
+      import Plug.Conn
     end
   end
 
@@ -40,7 +41,6 @@ defmodule GameKeeperWeb do
   def controller do
     quote do
       use Phoenix.Controller, formats: [:html, :json]
-
       use Gettext, backend: GameKeeperWeb.Gettext
 
       import Plug.Conn
@@ -83,14 +83,15 @@ defmodule GameKeeperWeb do
       # Translation
       use Gettext, backend: GameKeeperWeb.Gettext
 
+      import GameKeeperWeb.CoreComponents
+
       # HTML escaping functionality
       import Phoenix.HTML
       # Core UI components
-      import GameKeeperWeb.CoreComponents
+      alias GameKeeperWeb.Layouts
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS
-      alias GameKeeperWeb.Layouts
 
       # Routes generation with the ~p sigil
       unquote(verified_routes())

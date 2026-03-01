@@ -17,14 +17,16 @@ defmodule GameKeeperSupport.DataCase do
   use ExUnit.CaseTemplate
   use Boundary, check: [in: false, out: false]
 
+  alias Ecto.Adapters.SQL.Sandbox
+
   using do
     quote do
-      alias GameKeeper.Repo
-
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
       import GameKeeperSupport.DataCase
+
+      alias GameKeeper.Repo
     end
   end
 
@@ -37,8 +39,8 @@ defmodule GameKeeperSupport.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(GameKeeper.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    pid = Sandbox.start_owner!(GameKeeper.Repo, shared: not tags[:async])
+    on_exit(fn -> Sandbox.stop_owner(pid) end)
   end
 
   @doc """

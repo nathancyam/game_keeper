@@ -6,6 +6,7 @@ defmodule GameKeeper.Sports do
   on a game (e.g. `"basketball"`). Each sport module implements the
   `GameKeeper.Sports.Sport` behaviour.
   """
+  use Boundary, exports: :all
 
   @sports %{
     "basketball" => GameKeeper.Sports.Basketball

@@ -1,17 +1,17 @@
 defmodule GameKeeper.Events.Producer do
+  @moduledoc false
+  @behaviour Broadway.Acknowledger
+
   use GenStage
 
   alias GameKeeper.Events.Message
-
-  @behaviour Broadway.Acknowledger
 
   def start_link(opts) do
     {name, opts} = Keyword.pop(opts, :name, __MODULE__)
     GenStage.start_link(__MODULE__, opts, name: name)
   end
 
-  def push_and_ack_events(game_id, events)
-      when is_binary(game_id) and is_list(events) do
+  def push_and_ack_events(game_id, events) when is_binary(game_id) and is_list(events) do
     [producer] = Broadway.producer_names(GameKeeper.Events.Pipeline)
     GenStage.call(producer, {:push_events, game_id, events})
   end

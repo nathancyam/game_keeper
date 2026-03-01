@@ -49,6 +49,7 @@ defmodule GameKeeper.MixProject do
       {:phoenix, "~> 1.8.4"},
       {:phoenix_ecto, "~> 4.5"},
       {:ecto_sql, "~> 3.13"},
+      {:styler, "~> 1.11", only: [:dev, :test], runtime: false},
       {:gen_stage, "~> 1.3"},
       {:broadway, "~> 1.2"},
       {:postgrex, ">= 0.0.0"},
