@@ -8,7 +8,7 @@ defmodule GameKeeper.Repo.Migrations.CreateGameActors do
       add :name, :string
       add :type, :string, comment: "The type of the actor, e.g. 'player', 'coach', 'volunteer'"
       add :game_id, references(:games, on_delete: :delete_all, type: :binary_id), null: false
-      add :team_id, references(:teams, on_delete: :delete_all, type: :binary_id)
+      add :team_id, references(:game_teams, on_delete: :delete_all, type: :binary_id)
 
       timestamps(type: :utc_datetime)
     end

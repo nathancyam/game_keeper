@@ -5,5 +5,5 @@ defmodule GameKeeper.Simulators do
   Each sport has its own simulator module under this namespace.
   """
 
-  use Boundary, deps: [GameKeeper.Basketball, GameKeeper.EventProcessing, GameKeeper.Games]
+  use Boundary, deps: [GameKeeper.Basketball, GameKeeper.EventProcessing, GameKeeper.Games, GameKeeper.Sports]
 end

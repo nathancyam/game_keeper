@@ -3,11 +3,11 @@ defmodule GameKeeper.Basketball.Team do
   Represents a team participating in a basketball game.
   """
 
-  @enforce_keys [:id, :name]
-  defstruct [:id, :name]
-
   @type t :: %__MODULE__{
           id: term(),
           name: String.t()
         }
+
+  @enforce_keys [:id, :name]
+  defstruct [:id, :name]
 end

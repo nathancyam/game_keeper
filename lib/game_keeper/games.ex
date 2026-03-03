@@ -16,18 +16,51 @@ defmodule GameKeeper.Games do
   alias Ecto.Changeset
   alias GameKeeper.Repo
   alias GameKeeper.Schemas.Game
+  alias GameKeeper.Schemas.GameActor
+  alias GameKeeper.Sports.GameConfiguration
 
   @doc """
   Creates a new game record for the given sport and name.
 
-  Returns `{:ok, %Game{}}` on success or `{:error, changeset}` on validation
+  Returns `{:ok, %Game{}, [%GameActor{}]}` on success or `{:error, changeset}` on validation
   failure.
   """
-  def create_game(sport, name) when is_atom(sport) and is_binary(name) do
-    %Game{}
-    |> Changeset.cast(%{sport: sport, name: name}, [:sport, :name])
-    |> Changeset.validate_required([:sport, :name])
-    |> Repo.insert()
+  def create_game(sport, name, %GameConfiguration{} = config) when is_atom(sport) and is_binary(name) do
+    {:ok, {game, actors}} =
+      Repo.transact(fn ->
+        {:ok, game} =
+          %Game{}
+          |> Changeset.cast(%{sport: sport, name: name}, [:sport, :name])
+          |> Changeset.validate_required([:sport, :name])
+          |> Repo.insert()
+
+        placeholders = %{timestamp: DateTime.utc_now(:second)}
+
+        actors =
+          Enum.flat_map([:players, :coaches, :volunteers], fn role ->
+            config
+            |> Map.get(role, [])
+            |> Enum.map(fn actor ->
+              %{
+                game_id: game.id,
+                type:
+                  case role do
+                    :players -> :player
+                    :coaches -> :coach
+                    :volunteers -> :volunteer
+                  end,
+                name: actor.name,
+                inserted_at: {:placeholder, :timestamp},
+                updated_at: {:placeholder, :timestamp}
+              }
+            end)
+          end)
+
+        {_, actors} = Repo.insert_all(GameActor, actors, placeholders: placeholders, returning: true)
+        {:ok, {game, actors}}
+      end)
+
+    {:ok, game, actors}
   end
 
   @doc """

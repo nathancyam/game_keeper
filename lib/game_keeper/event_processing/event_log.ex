@@ -16,7 +16,7 @@ defmodule GameKeeper.EventProcessing.EventLog do
     game = opts[:game]
     events = EventProcessing.get_event_log(game)
 
-    last_offset = events |> hd() |> Map.get(:offset)
+    last_offset = events |> List.first(%{offset: 0}) |> Map.get(:offset)
 
     {:ok, %{game: game, sport: opts[:sport], events: events, offset: last_offset}}
   end

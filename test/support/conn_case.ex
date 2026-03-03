@@ -21,6 +21,7 @@ defmodule GameKeeperWebSupport.ConnCase do
   using do
     quote do
       use GameKeeperWeb, :verified_routes
+
       import GameKeeperWebSupport.ConnCase
       import Phoenix.ConnTest
       import Plug.Conn

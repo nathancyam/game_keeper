@@ -16,6 +16,8 @@ defmodule GameKeeper.Schemas.GameEventLog do
     field :module, :string
 
     belongs_to :game, GameKeeper.Schemas.Game
+    belongs_to :actor, GameKeeper.Schemas.GameActor, foreign_key: :actor_id
+    belongs_to :team, GameKeeper.Schemas.GameTeam
 
     timestamps(type: :utc_datetime, updated_at: false)
   end

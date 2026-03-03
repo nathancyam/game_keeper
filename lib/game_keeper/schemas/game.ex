@@ -11,6 +11,8 @@ defmodule GameKeeper.Schemas.Game do
     field :sport, Ecto.Enum, values: [:basketball]
 
     has_many :events, GameKeeper.Schemas.GameEventLog, preload_order: [asc: :occured_at]
+    has_many :actors, GameKeeper.Schemas.GameActor
+    has_many :teams, GameKeeper.Schemas.GameTeam
 
     timestamps(type: :utc_datetime)
   end
