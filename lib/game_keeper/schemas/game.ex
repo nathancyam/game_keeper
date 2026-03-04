@@ -14,6 +14,8 @@ defmodule GameKeeper.Schemas.Game do
     has_many :actors, GameKeeper.Schemas.GameActor
     has_many :teams, GameKeeper.Schemas.GameTeam
 
+    has_many :snapshots, GameKeeper.Schemas.GameSnapshot
+
     timestamps(type: :utc_datetime)
   end
 
