@@ -16,21 +16,25 @@ defmodule GameKeeper.Simulators.Basketball do
 
   """
 
+  alias GameKeeper.Basketball.FoulEvent
   alias GameKeeper.Basketball.ScoreEvent
   alias GameKeeper.Basketball.Team
+  alias GameKeeper.Basketball.TurnoverEvent
   alias GameKeeper.EventProcessing
   alias GameKeeper.Games
 
   # 2-pointers most common, 3-pointers second, free throws least common
   @point_weights [1, 2, 2, 2, 3, 3]
+  # personal/shooting most common, technical very rare
+  @foul_weights [:personal, :personal, :personal, :shooting, :shooting, :offensive, :loose_ball, :intentional, :technical]
   @plays_per_period 18..28
   @default_periods 4
 
-  def simulate_many(count) do
+  def simulate_many(count, prefix) when is_integer(count) and is_binary(prefix) do
     tasks =
       for _ <- 1..count do
         Task.async(fn ->
-          simulate(random_name())
+          simulate("#{prefix} #{random_name()}")
         end)
       end
 
@@ -94,8 +98,14 @@ defmodule GameKeeper.Simulators.Basketball do
       |> Enum.reduce(%{home: 0, away: 0}, fn event, score ->
         {:ok, _offset} = Games.log_events(game_id, [event])
 
-        key = if event.team.id == home_team.id, do: :home, else: :away
-        Map.update!(score, key, &(&1 + event.points))
+        case event do
+          %ScoreEvent{} ->
+            key = if event.team.id == home_team.id, do: :home, else: :away
+            Map.update!(score, key, &(&1 + event.points))
+
+          _ ->
+            score
+        end
       end)
 
     {:ok, score}
@@ -106,14 +116,37 @@ defmodule GameKeeper.Simulators.Basketball do
 
     {events, _time} =
       Enum.reduce(1..plays, {[], start_time}, fn _, {acc, time} ->
-        event = %ScoreEvent{
-          points: Enum.random(@point_weights),
-          team: Enum.random(teams),
-          actor_id: actors |> Enum.random() |> Map.get(:id),
-          occurred_at: time
-        }
+        random_actor_id = actors |> Enum.random() |> Map.get(:id)
 
-        {[event | acc], DateTime.add(time, Enum.random(10..45), :second)}
+        d20 = Enum.random(1..20)
+
+        event =
+          cond do
+            d20 in 1..5 ->
+              %FoulEvent{
+                foul_type: Enum.random(@foul_weights),
+                actor_id: random_actor_id,
+                occurred_at: time
+              }
+
+            d20 in 6..9 ->
+              %TurnoverEvent{
+                cause: :travel,
+                actor_id: random_actor_id,
+                occurred_at: time
+              }
+
+            true ->
+              %ScoreEvent{
+                points: Enum.random(@point_weights),
+                team: Enum.random(teams),
+                actor_id: random_actor_id,
+                occurred_at: time
+              }
+          end
+
+        next_time = DateTime.add(time, Enum.random(10..45), :second)
+        {[event | acc], next_time}
       end)
 
     Enum.reverse(events)
